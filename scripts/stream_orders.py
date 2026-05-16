@@ -27,12 +27,12 @@ DELIVERY_STATUS = ["Chờ xác nhận", "Đang giao", "Thành công", "Đã hủ
 STATUS_WEIGHTS = [0.1, 0.2, 0.6, 0.05, 0.05]
 
 # even hub credentials
-BOOSTRAP_SERVERS = os.getenv('BOOSTRAP_SERVERS')
+BOOTSTRAP_SERVERS = os.getenv('BOOTSTRAP_SERVERS')
 EVENT_HUB_CONNECTION_STRING = os.getenv('EVENT_HUB_CONNECTION_STRING')
 EVENT_HUB_NAME = os.getenv('EVENT_HUB_NAME')
 
 producer = KafkaProducer(
-    bootstrap_servers=BOOSTRAP_SERVERS,
+    bootstrap_servers=BOOTSTRAP_SERVERS,
     security_protocol='SASL_SSL',
     sasl_mechanism='PLAIN',
     sasl_plain_username='$ConnectionString',
