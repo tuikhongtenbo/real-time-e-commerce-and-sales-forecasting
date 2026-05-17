@@ -152,9 +152,79 @@ real-time-e-commerce-and-sales-forecasting/
 ├── plan/
 │   ├── pipeline.html                    # Architecture diagram source
 │   ├── dashboard.html                   # Real-time Web Dashboard (Power BI equivalent)
-│   ├── dashboard.css                  
-│   └── dashboard.js                   
+│   ├── dashboard.css                
+│   └── dashboard.js                 
 ├── images/                              # Project documentation assets
 ├── .env.example                         # Environment configuration template
 └── README.md
 ```
+
+---
+
+## 7. How to Run
+
+### Prerequisites
+
+Before running the pipeline, ensure you have:
+
+- **Python 3.8+** installed locally.
+- An active **Azure Subscription**.
+- An **Azure Event Hubs** namespace configured with a Kafka-enabled Hub named `ecommerce-orders`.
+- An **Azure Storage Account** with a container named `ecommerce` to act as the Data Lakehouse storage.
+- An **Azure Databricks** Workspace configured with access to the Azure Storage Account (using ADLS Gen2 Account Key or Service Principal).
+
+### Setup Environment Variables
+
+Clone the repository and create a `.env` file in the root directory by copying the example template:
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` and fill in your Azure Event Hubs and Azure Storage credentials:
+
+```ini
+# Kafka / Azure Event Hubs Configuration
+BOOTSTRAP_SERVERS='<your-eventhub-namespace>.servicebus.windows.net:9093'
+EVENT_HUB_CONNECTION_STRING='Endpoint=sb://<your-eventhub-namespace>.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=<your-key>'
+EVENT_HUB_NAME='ecommerce-orders'
+EVENT_HUB_NAMESPACE='<your-eventhub-namespace>.servicebus.windows.net'
+
+# Azure Blob Storage (Bronze Layer)
+AZURE_STORAGE_CONNECTION_STRING='DefaultEndpointsProtocol=https;AccountName=<your-storage-name>;AccountKey=<your-storage-key>;EndpointSuffix=core.windows.net'
+AZURE_CONTAINER_NAME='ecommerce'
+
+# Azure Data Lake Storage Gen2 (for Databricks)
+STORAGE_ACCOUNT_NAME='<your-storage-name>'
+STORAGE_ACCOUNT_ACCESS_KEY='<your-storage-key>'
+```
+
+### Install Local Dependencies
+
+Create a virtual environment and install the required Python packages:
+
+```bash
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install kafka-python pandas python-dotenv azure-storage-blob
+```
+
+### Running the Local Producer (Event Streamer)
+
+Start the simulated e-commerce orders stream by executing the Python producer script. This script loads dimension data (`dim_customers.csv`, `dim_products.csv`) from the `data/` folder and begins pushing continuous mock order events (JSON payloads) to Azure Event Hubs:
+
+```bash
+cd scripts
+python stream_orders.py
+```
+
+### Running the Data Lakehouse Pipeline on Databricks
+
+Upload the notebooks from the `databricks/` folder to your Databricks workspace and run them sequentially:
+
+1. **`stream_eventhub_to_bronze.py`**: Reads raw order streams directly from Azure Event Hubs and writes them to the `bronze` Delta table.
+2. **`stream_bronze_to_silver.py`**: Flattens nested JSON structures, performs data quality checks, and writes clean transaction records to the `silver` Delta table.
+3. **`stream_silver_to_gold.py`**: Performs windowed (1-minute) groupings to aggregate revenue and items sold by region and province, updating the `gold` Delta table.
