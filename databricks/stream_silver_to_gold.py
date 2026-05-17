@@ -1,12 +1,12 @@
 from pyspark.sql.functions import *
 
 spark.conf.set(
-    "fs.azure.account.key.<storage_account>.dfs.core.windows.net",
-    "<Storage_Account_Access_Key>"
+    "fs.azure.account.key.ecommercestoragethang.dfs.core.windows.net",
+    dbutils.secrets.get(scope="ecommerce-scope", key="storage-key")
 )
 
-silver_path = "abfss://ecommerce@<storage_account>.dfs.core.windows.net/silver/"
-gold_path = "abfss://ecommerce@<storage_account>.dfs.core.windows.net/gold/"
+silver_path = "abfss://ecommerce@ecommercestoragethang.dfs.core.windows.net/silver/"
+gold_path = "abfss://ecommerce@ecommercestoragethang.dfs.core.windows.net/gold/"
 
 df_silver = (
     spark.readStream

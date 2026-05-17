@@ -18,9 +18,9 @@ schema = StructType([
     StructField('delivery_status', StringType()),
 ])
 
-event_hub_namespace = "<NAMESPACE_HOST_NAME>"
-event_hub_name = "<EVENT_HUB_NAME>"
-event_hub_conn_str = "<YOUR_EVENT_HUB_CONNECTION_STRING>"
+event_hub_namespace = "ecommerce-real-time-namespace.servicebus.windows.net"
+event_hub_name = "ecommerce-orders"
+event_hub_conn_str = dbutils.secrets.get(scope="ecommerce-scope", key="event-hub-conn-str")
 
 eh_conf = {
     'kafka.bootstrap.servers': f"{event_hub_namespace}:9093",
@@ -46,16 +46,17 @@ df_orders = (
 )
 
 spark.conf.set(
-    "fs.azure.account.key.<storage_account>.dfs.core.windows.net",
-    "<Storage_Account_Access_Key>"
+    "fs.azure.account.key.ecommercestoragethang.dfs.core.windows.net",
+    dbutils.secrets.get(scope="ecommerce-scope", key="storage-key")
 )
 
-bronze_path = "abfss://ecommerce@<storage_account>.dfs.core.windows.net/bronze/"
+bronze_path = "abfss://ecommerce@ecommercestoragethang.dfs.core.windows.net/bronze/"
 
 (
     df_orders.writeStream
     .format('delta')
     .outputMode("append")
-    .option("checkpointLocation", bronze_path + "_checkpoint")
+    .option("checkpointLocation", bronze_path + "_checkpoint_")
+    .trigger(availableNow=True)
     .start(bronze_path)
 )
