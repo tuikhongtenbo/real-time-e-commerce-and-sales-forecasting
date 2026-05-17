@@ -1,4 +1,4 @@
-# Real-Time E-Commerce Insights & Sales Forecasting
+# Real-Time E-Commerce & Sales Forecasting
 
 > An end-to-end real-time streaming pipeline ingesting mock e-commerce transactions into an Azure Data Lakehouse. Transformed via the **Medallion Architecture** using PySpark Structured Streaming and compiled for analytics — serving actionable insights directly to Real-time Dashboards.
 
@@ -127,9 +127,9 @@ gold_streaming_df.writeStream \
 
 ## 5. Power BI Dashboard
 
-> 🔗 **Live Interactive View:** 
+> 🔗 **Live Interactive Dashboard:** [View on Power BI Service](https://app.powerbi.com/view?r=eyJrIjoiZDhhMzllNmEtYzdlZi00N2FmLWE4NjMtMDllMWE3Mjk3MTkwIiwidCI6IjZhYzJhZDA2LTY5MmMtNDY2My1iN2FmLWE5ZmYyYTg2NmQwYyIsImMiOjEwfQ%3D%3D)
 
-### Real-Time Sales Analytics Dashboard
+![E-Commerce Real-Time Sales Dashboard](images/dashboard.png)
 
 - **KPI Metrics**: Total Sales Revenue, Average Order Value, Total Items Sold, Active Provinces.
 - **Geographic Mapping**: Interactive Map of Vietnam visualizing revenue intensity by province.
